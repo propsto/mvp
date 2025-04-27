@@ -19,7 +19,8 @@ import {
   FormField, 
   FormItem, 
   FormLabel, 
-  FormMessage 
+  FormMessage, 
+  FormDescription 
 } from "@/components/ui/form";
 import { Building, Plus, Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
