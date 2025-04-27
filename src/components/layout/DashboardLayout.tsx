@@ -1,25 +1,24 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarTrigger, 
-  SidebarProvider, 
-  SidebarMenu, 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarTrigger,
+  SidebarProvider,
+  SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarHeader
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/layout/Navbar";
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Users, 
-  Key, 
+import {
+  LayoutDashboard,
+  MessageSquare,
+  Users,
+  Key,
   Settings,
-  Building
+  Building,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -28,39 +27,39 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
-  const [organizationName, setOrganizationName] = useState("My Organization");
+  const [organizationName, setOrganizationName] = useState("Props.to");
   const [userName, setUserName] = useState("John Doe");
 
   const menuItems = [
-    { 
-      name: "Dashboard", 
-      icon: LayoutDashboard, 
-      path: "/dashboard" 
+    {
+      name: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
     },
-    { 
-      name: "Feedback", 
-      icon: MessageSquare, 
-      path: "/feedback" 
+    {
+      name: "Feedback",
+      icon: MessageSquare,
+      path: "/feedback",
     },
-    { 
-      name: "Users", 
-      icon: Users, 
-      path: "/users" 
+    {
+      name: "Users",
+      icon: Users,
+      path: "/users",
     },
-    { 
-      name: "Organizations", 
-      icon: Building, 
-      path: "/organizations" 
+    {
+      name: "Organizations",
+      icon: Building,
+      path: "/organizations",
     },
-    { 
-      name: "API Keys", 
-      icon: Key, 
-      path: "/api" 
+    {
+      name: "API Keys",
+      icon: Key,
+      path: "/api",
     },
-    { 
-      name: "Settings", 
-      icon: Settings, 
-      path: "/settings" 
+    {
+      name: "Settings",
+      icon: Settings,
+      path: "/settings",
     },
   ];
 
@@ -71,17 +70,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="flex flex-1 overflow-hidden">
           <Sidebar className="hidden md:flex">
             <SidebarHeader className="h-16 border-b flex items-center px-4">
-              <span className="text-xl font-semibold text-props-primary">人</span>
-              <span className="ml-2 text-lg font-medium">{organizationName}</span>
+              <span className="text-xl font-semibold text-props-primary">
+                人
+              </span>
+              <span className="ml-2 text-lg font-medium">
+                {organizationName}
+              </span>
             </SidebarHeader>
             <SidebarContent className="pt-6">
               <SidebarMenu>
                 {menuItems.map((item) => (
                   <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild className={cn(
-                      "w-full px-3 justify-start gap-3",
-                      location.pathname === item.path && "bg-sidebar-accent"
-                    )}>
+                    <SidebarMenuButton
+                      asChild
+                      className={cn(
+                        "w-full px-3 justify-start gap-3",
+                        location.pathname === item.path && "bg-sidebar-accent"
+                      )}
+                    >
                       <Link to={item.path}>
                         <item.icon className="h-5 w-5" />
                         <span>{item.name}</span>
@@ -97,9 +103,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               <div className="md:hidden mb-6">
                 <SidebarTrigger />
               </div>
-              <div>
-                {children}
-              </div>
+              <div>{children}</div>
             </div>
           </div>
         </div>
