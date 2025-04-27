@@ -69,7 +69,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <Navbar isAuthenticated={true} userName={userName} />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar className="hidden md:flex">
-            <SidebarHeader className="h-16 border-b flex items-center px-4">
+            <SidebarHeader className="h-16 border-b flex items-center px-4 flex-row">
               <span className="text-xl font-semibold text-props-primary">
                 人
               </span>
