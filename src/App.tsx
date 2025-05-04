@@ -16,12 +16,12 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import Dashboard from "./pages/Dashboard/Index";
 import FeedbackPage from "./pages/Feedback/Index";
 import APIPage from "./pages/API/Index";
-import OrganizationsPage from "./pages/Organizations/Index";
 import SettingsPage from "./pages/Settings";
 import FeedbackTypesPage from "./pages/Settings/FeedbackTypes";
 import ProfilePage from "./pages/ProfilePage";
 import EmailSettingsPage from "./pages/Settings/EmailsSettings";
 import EmailEditorPage from "./pages/Settings/EmailEditorPage";
+import FeedbackFormPage from "./pages/FeedbackFormPage";
 
 const App = () => {
   // Create a client inside the component to maintain React context
@@ -45,15 +45,14 @@ const App = () => {
               <Route path="/dashboard" element={<RouteGuard><Dashboard /></RouteGuard>} />
               <Route path="/feedback" element={<RouteGuard><FeedbackPage /></RouteGuard>} />
               <Route path="/api" element={<RouteGuard><APIPage /></RouteGuard>} />
-              <Route path="/organizations" element={<RouteGuard><OrganizationsPage /></RouteGuard>} />
               <Route path="/settings" element={<RouteGuard><SettingsPage /></RouteGuard>} />
               <Route path="/settings/feedback-types" element={<RouteGuard><FeedbackTypesPage /></RouteGuard>} />
               <Route path="/settings/emails" element={<RouteGuard><EmailSettingsPage /></RouteGuard>} />
               <Route path="/settings/email/:emailId" element={<RouteGuard><EmailEditorPage /></RouteGuard>} />
               
               {/* Profile Routes */}
-              <Route path="/:username" element={<ProfilePage />} />
-              <Route path="/:username/:feedbackType" element={<ProfilePage />} />
+              <Route path="/:identifier" element={<ProfilePage />} />
+              <Route path="/:identifier/:feedbackType" element={<FeedbackFormPage />} />
               
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />

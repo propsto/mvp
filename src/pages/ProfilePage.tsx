@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import FeedbackTypeCard from "@/components/feedback/FeedbackTypeCard";
 
 const ProfilePage = () => {
-  const { username } = useParams<{ username: string }>();
+  const { identifier } = useParams<{ identifier: string }>();
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [feedbackTypes, setFeedbackTypes] = useState<FeedbackType[]>([]);
   const [userEmails, setUserEmails] = useState<UserEmail[]>([]);
@@ -27,11 +27,16 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         
+        if (!identifier) {
+          setError("No identifier provided");
+          return;
+        }
+        
         // Try username first
         let { data: profileByUsername, error: usernameError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("username", username)
+          .eq("username", identifier)
           .maybeSingle();
         
         // If no profile found by username, try as email
@@ -39,7 +44,7 @@ const ProfilePage = () => {
           const { data: profileByEmail, error: emailError } = await supabase
             .from("profiles")
             .select("*")
-            .eq("email", username)
+            .eq("email", identifier)
             .maybeSingle();
             
           if (emailError) throw emailError;
@@ -53,7 +58,7 @@ const ProfilePage = () => {
           const { data: userEmailData, error: userEmailError } = await supabase
             .from("user_emails")
             .select("*")
-            .eq("email", username)
+            .eq("email", identifier)
             .maybeSingle();
             
           if (userEmailError) throw userEmailError;
@@ -69,19 +74,14 @@ const ProfilePage = () => {
             if (profileError) throw profileError;
             
             if (associatedProfile) {
-              // Use the profile associated with this email
-              profileByUsername = associatedProfile;
-              
-              // Also set the custom display name and bio if available from the email
-              if (userEmailData.display_name) {
-                profileByUsername.display_name = userEmailData.display_name;
-              }
-              if (userEmailData.bio) {
-                profileByUsername.bio = userEmailData.bio;
-              }
-              if (userEmailData.avatar_url) {
-                profileByUsername.avatar_url = userEmailData.avatar_url;
-              }
+              // Create a modified profile with email-specific customizations
+              profileByUsername = {
+                ...associatedProfile,
+                // Override with email profile data if available
+                display_name: userEmailData.display_name || associatedProfile.display_name,
+                bio: userEmailData.bio || associatedProfile.bio,
+                avatar_url: userEmailData.avatar_url || associatedProfile.avatar_url
+              };
             } else {
               setError("Profile not found");
               setLoading(false);
@@ -135,10 +135,10 @@ const ProfilePage = () => {
       }
     };
     
-    if (username) {
+    if (identifier) {
       fetchProfile();
     }
-  }, [username, user]);
+  }, [identifier, user]);
 
   if (loading) {
     return (
@@ -225,6 +225,7 @@ const ProfilePage = () => {
                     key={type.id}
                     feedbackType={type}
                     profileId={profileData.id}
+                    identifier={identifier!}
                   />
                 ))}
               </div>
@@ -303,10 +304,10 @@ const ProfilePage = () => {
             <TabsContent value="manage" className="mt-6">
               <div className="flex flex-col space-y-4">
                 <Link to="/settings/feedback-types">
-                  <Button>Manage Feedback Types</Button>
+                  <Button className="w-full">Manage Feedback Types</Button>
                 </Link>
                 <Link to="/settings/emails">
-                  <Button variant="outline">Manage Email Profiles</Button>
+                  <Button variant="outline" className="w-full">Manage Email Profiles</Button>
                 </Link>
               </div>
             </TabsContent>

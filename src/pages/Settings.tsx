@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const profileSchema = z.object({
   username: z.string()
@@ -115,6 +116,21 @@ const SettingsPage = () => {
               </form>
             </Form>
           </CardContent>
+          <CardFooter className="flex justify-between border-t pt-5">
+            <h3 className="font-medium">Additional Settings</h3>
+            <div className="flex space-x-2">
+              <Button variant="outline" asChild>
+                <Link to="/settings/feedback-types">
+                  Feedback Types
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/settings/emails">
+                  Email Profiles
+                </Link>
+              </Button>
+            </div>
+          </CardFooter>
         </Card>
       </div>
     </DashboardLayout>

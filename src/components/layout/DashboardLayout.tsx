@@ -19,7 +19,6 @@ import {
   Users,
   Key,
   Settings,
-  Building,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -51,9 +50,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       path: "/users",
     },
     {
-      name: "Organizations",
-      icon: Building,
-      path: "/organizations",
+      name: "Feedback Types",
+      icon: MessageSquare,
+      path: "/settings/feedback-types",
     },
     {
       name: "API Keys",
