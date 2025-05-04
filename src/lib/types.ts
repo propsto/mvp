@@ -22,27 +22,33 @@ export interface Organization {
 
 export interface Profile {
   id: string;
-  userId: string;
-  organizationId: string;
-  displayName: string;
-  bio?: string;
-  avatarUrl?: string;
-  isClaimed: boolean;
-  publicIdentifier?: string; // email or link that can be used for claiming
-  createdAt: Date;
-  updatedAt: Date;
+  username: string; 
+  email: string;
+  display_name?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface FeedbackType {
+  id: string;
+  profile_id: string;
+  name: string;
+  description?: string | null;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Feedback {
   id: string;
-  profileId: string; // profile receiving feedback
-  authorId?: string; // user giving feedback (optional)
-  organizationId: string;
+  profile_id: string; // profile receiving feedback
+  type_id?: string | null; // feedback type
+  sender_id?: string | null; // user giving feedback (optional)
   content: string;
-  rating?: number; // optional rating
-  isPublic: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  is_anonymous: boolean;
+  created_at: Date;
 }
 
 export interface ApiKey {

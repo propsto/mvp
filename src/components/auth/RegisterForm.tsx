@@ -1,17 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Link } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const registerSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  organization: z.string().min(2, { message: "Organization must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   confirmPassword: z.string(),
@@ -23,72 +21,34 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const RegisterForm: React.FC = () => {
-  const { toast } = useToast();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
-      organization: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    // Simulate registration
-    console.log("Registration attempt with:", data);
-    
-    // Mock successful registration
-    toast({
-      title: "Registration successful",
-      description: "Your account has been created. Redirecting to dashboard...",
-    });
-    
-    // In a real app, you would redirect after successful registration
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1000);
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      setIsSubmitting(true);
+      await signUp(data.email, data.password);
+      navigate("/auth/login", { replace: true });
+    } catch (error) {
+      console.error("Registration error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full name</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="John Doe" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="organization"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Organization name</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Acme Inc." 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="email"
@@ -142,8 +102,12 @@ const RegisterForm: React.FC = () => {
         />
 
         <div>
-          <Button type="submit" className="w-full bg-props-primary hover:bg-props-accent">
-            Create account
+          <Button 
+            type="submit" 
+            className="w-full bg-props-primary hover:bg-props-accent"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
         </div>
 

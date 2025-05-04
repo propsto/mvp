@@ -4,6 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import RouteGuard from "@/components/auth/RouteGuard";
+
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Auth/Login";
@@ -13,7 +17,9 @@ import Dashboard from "./pages/Dashboard/Index";
 import FeedbackPage from "./pages/Feedback/Index";
 import APIPage from "./pages/API/Index";
 import OrganizationsPage from "./pages/Organizations/Index";
-import { useState } from "react";
+import SettingsPage from "./pages/Settings";
+import FeedbackTypesPage from "./pages/Settings/FeedbackTypes";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   // Create a client inside the component to maintain React context
@@ -21,24 +27,36 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/register" element={<Register />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/feedback" element={<FeedbackPage />} />
-            <Route path="/api" element={<APIPage />} />
-            <Route path="/organizations" element={<OrganizationsPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/register" element={<Register />} />
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+              
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={<RouteGuard><Dashboard /></RouteGuard>} />
+              <Route path="/feedback" element={<RouteGuard><FeedbackPage /></RouteGuard>} />
+              <Route path="/api" element={<RouteGuard><APIPage /></RouteGuard>} />
+              <Route path="/organizations" element={<RouteGuard><OrganizationsPage /></RouteGuard>} />
+              <Route path="/settings" element={<RouteGuard><SettingsPage /></RouteGuard>} />
+              <Route path="/settings/feedback-types" element={<RouteGuard><FeedbackTypesPage /></RouteGuard>} />
+              
+              {/* Profile Routes */}
+              <Route path="/:username" element={<ProfilePage />} />
+              <Route path="/:username/:feedbackType" element={<ProfilePage />} />
+              
+              {/* Catch-all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

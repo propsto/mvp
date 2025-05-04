@@ -11,17 +11,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu, User, LogOut, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface NavbarProps {
-  isAuthenticated?: boolean;
-  userName?: string;
-}
-
-const Navbar: React.FC<NavbarProps> = ({
-  isAuthenticated = false,
-  userName = "",
-}) => {
+const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const displayName = profile?.display_name || profile?.username || user?.email || "";
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({
               About
             </Link>
             
-            {isAuthenticated ? (
+            {user ? (
               <div className="ml-4 flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -56,12 +56,18 @@ const Navbar: React.FC<NavbarProps> = ({
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{userName}</p>
+                        <p className="text-sm font-medium leading-none">{displayName}</p>
+                        {profile?.username && (
+                          <p className="text-xs text-muted-foreground">@{profile.username}</p>
+                        )}
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to="/dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={`/${profile?.username || ''}`}>My Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/settings">
@@ -70,7 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
@@ -114,15 +120,22 @@ const Navbar: React.FC<NavbarProps> = ({
               About
             </Link>
             
-            {isAuthenticated ? (
+            {user ? (
               <>
+                <div className="px-3 py-2 font-medium text-sm">{displayName}</div>
                 <Link to="/dashboard" className="text-gray-700 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">
                   Dashboard
+                </Link>
+                <Link to={`/${profile?.username || ''}`} className="text-gray-700 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">
+                  My Profile
                 </Link>
                 <Link to="/settings" className="text-gray-700 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">
                   Settings
                 </Link>
-                <button className="text-gray-700 hover:bg-gray-100 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
+                <button 
+                  onClick={handleSignOut} 
+                  className="text-gray-700 hover:bg-gray-100 block w-full text-left px-3 py-2 rounded-md text-base font-medium"
+                >
                   Log out
                 </button>
               </>

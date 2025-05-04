@@ -1,13 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Link } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -17,7 +17,13 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginForm: React.FC = () => {
-  const { toast } = useToast();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get the redirect path from location state or default to dashboard
+  const from = (location.state as any)?.from?.pathname || "/dashboard";
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -27,20 +33,16 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    // Simulate authentication
-    console.log("Login attempt with:", data);
-    
-    // Mock successful login
-    toast({
-      title: "Login successful",
-      description: "Redirecting to dashboard...",
-    });
-    
-    // In a real app, you would redirect after successful login
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1000);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsSubmitting(true);
+      await signIn(data.email, data.password);
+      navigate(from, { replace: true });
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -90,8 +92,12 @@ const LoginForm: React.FC = () => {
         />
 
         <div>
-          <Button type="submit" className="w-full bg-props-primary hover:bg-props-accent">
-            Sign in
+          <Button 
+            type="submit" 
+            className="w-full bg-props-primary hover:bg-props-accent"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </div>
 
