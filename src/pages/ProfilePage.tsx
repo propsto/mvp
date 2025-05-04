@@ -1,18 +1,20 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile, FeedbackType } from "@/lib/types";
+import { Profile, FeedbackType, UserEmail } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import FeedbackForm from "@/components/feedback/FeedbackForm";
+import FeedbackTypeCard from "@/components/feedback/FeedbackTypeCard";
 
 const ProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [feedbackTypes, setFeedbackTypes] = useState<FeedbackType[]>([]);
+  const [userEmails, setUserEmails] = useState<UserEmail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
@@ -47,9 +49,33 @@ const ProfilePage = () => {
         if (usernameError) throw usernameError;
         
         if (!profileByUsername) {
-          setError("Profile not found");
-          setLoading(false);
-          return;
+          // Check user_emails table for this identifier
+          const { data: userEmail, error: userEmailError } = await supabase
+            .from("user_emails")
+            .select("*, profiles(*)")
+            .eq("email", username)
+            .maybeSingle();
+            
+          if (userEmailError) throw userEmailError;
+          
+          if (userEmail) {
+            // Use the profile associated with this email
+            profileByUsername = userEmail.profiles;
+            // Also set the custom display name and bio if available
+            if (userEmail.display_name) {
+              profileByUsername.display_name = userEmail.display_name;
+            }
+            if (userEmail.bio) {
+              profileByUsername.bio = userEmail.bio;
+            }
+            if (userEmail.avatar_url) {
+              profileByUsername.avatar_url = userEmail.avatar_url;
+            }
+          } else {
+            setError("Profile not found");
+            setLoading(false);
+            return;
+          }
         }
         
         // Type assertion since we modified our Profile interface to match Supabase
@@ -66,6 +92,19 @@ const ProfilePage = () => {
         
         // Type assertion since we modified our FeedbackType interface to match Supabase
         setFeedbackTypes(types as FeedbackType[]);
+        
+        // If this is the current user, fetch their associated emails
+        if (isCurrentUser || (user && user.id === profileByUsername.id)) {
+          const { data: emails, error: emailsError } = await supabase
+            .from("user_emails")
+            .select("*")
+            .eq("user_id", profileByUsername.id);
+            
+          if (emailsError) throw emailsError;
+          
+          setUserEmails(emails as UserEmail[]);
+        }
+        
         setError(null);
       } catch (err: any) {
         console.error("Error fetching profile:", err);
@@ -78,7 +117,7 @@ const ProfilePage = () => {
     if (username) {
       fetchProfile();
     }
-  }, [username]);
+  }, [username, user, isCurrentUser]);
 
   if (loading) {
     return (
@@ -148,38 +187,26 @@ const ProfilePage = () => {
       <div className="mt-8">
         <Tabs defaultValue="feedback">
           <TabsList className="w-full">
-            <TabsTrigger className="flex-1" value="feedback">Give Feedback</TabsTrigger>
+            <TabsTrigger className="flex-1" value="feedback">Feedback</TabsTrigger>
+            {isCurrentUser && userEmails.length > 0 && (
+              <TabsTrigger className="flex-1" value="profiles">My Profiles</TabsTrigger>
+            )}
             {isCurrentUser && (
-              <TabsTrigger className="flex-1" value="manage">Manage Feedback Types</TabsTrigger>
+              <TabsTrigger className="flex-1" value="manage">Manage</TabsTrigger>
             )}
           </TabsList>
           
           <TabsContent value="feedback" className="mt-6">
             {feedbackTypes.length > 0 ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Leave Feedback for {profileData.display_name || profileData.username}</CardTitle>
-                  <CardDescription>
-                    Choose a feedback type below to get started
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {feedbackTypes.map((type) => (
-                      <div key={type.id} className="mb-4">
-                        <h3 className="font-medium text-lg">{type.name}</h3>
-                        {type.description && (
-                          <p className="text-sm text-gray-600 mt-1 mb-3">{type.description}</p>
-                        )}
-                        <FeedbackForm 
-                          profileId={profileData.id} 
-                          feedbackType={type} 
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {feedbackTypes.map((type) => (
+                  <FeedbackTypeCard 
+                    key={type.id}
+                    feedbackType={type}
+                    profileId={profileData.id}
+                  />
+                ))}
+              </div>
             ) : (
               <Card>
                 <CardContent className="p-6">
@@ -192,11 +219,75 @@ const ProfilePage = () => {
             )}
           </TabsContent>
           
+          {isCurrentUser && userEmails.length > 0 && (
+            <TabsContent value="profiles" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Profile Links</CardTitle>
+                  <CardDescription>
+                    Share these links to collect different types of feedback
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-md">
+                      <h3 className="font-medium">Main Profile</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {window.location.origin}/{profileData.username}
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/${profileData.username}`);
+                        }}
+                      >
+                        Copy Link
+                      </Button>
+                    </div>
+                    
+                    {userEmails.map((email) => (
+                      <div key={email.id} className="p-4 border rounded-md">
+                        <h3 className="font-medium">{email.display_name || email.email}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {window.location.origin}/{email.email}
+                        </p>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/${email.email}`);
+                            }}
+                          >
+                            Copy Link
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/settings/email/${email.id}`)}
+                          >
+                            Edit
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+          
           {isCurrentUser && (
             <TabsContent value="manage" className="mt-6">
-              <Link to="/settings/feedback-types">
-                <Button>Manage Feedback Types</Button>
-              </Link>
+              <div className="flex flex-col space-y-4">
+                <Link to="/settings/feedback-types">
+                  <Button>Manage Feedback Types</Button>
+                </Link>
+                <Link to="/settings/emails">
+                  <Button variant="outline">Manage Email Profiles</Button>
+                </Link>
+              </div>
             </TabsContent>
           )}
         </Tabs>
