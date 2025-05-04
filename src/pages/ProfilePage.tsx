@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +52,7 @@ const ProfilePage = () => {
           return;
         }
         
+        // Type assertion since we modified our Profile interface to match Supabase
         setProfileData(profileByUsername as Profile);
         
         // Fetch feedback types
@@ -64,6 +64,7 @@ const ProfilePage = () => {
           
         if (typesError) throw typesError;
         
+        // Type assertion since we modified our FeedbackType interface to match Supabase
         setFeedbackTypes(types as FeedbackType[]);
         setError(null);
       } catch (err: any) {

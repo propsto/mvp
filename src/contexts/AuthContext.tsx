@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
@@ -13,7 +12,7 @@ interface AuthContextProps {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateProfile: (profile: Partial<Profile>) => Promise<void>;
+  updateProfile: (profile: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -73,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
 
+      // Type assertion since we know this matches our Profile type now
       setProfile(data as Profile);
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -149,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateProfile = async (profileData: Partial<Profile>) => {
+  const updateProfile = async (profileData: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>) => {
     try {
       if (!user) throw new Error("Not authenticated");
 

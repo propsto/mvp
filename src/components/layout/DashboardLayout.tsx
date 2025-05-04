@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -27,8 +28,8 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
-  const [organizationName, setOrganizationName] = useState("Props.to");
-  const [userName, setUserName] = useState("John Doe");
+  const [organizationName] = useState("Props.to");
+  const [userName] = useState("John Doe");
 
   const menuItems = [
     {
@@ -66,7 +67,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
-        <Navbar isAuthenticated={true} userName={userName} />
+        <Navbar userName={userName} />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar className="hidden md:flex">
             <SidebarHeader className="h-16 border-b flex items-center px-4 flex-row">

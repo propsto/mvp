@@ -27,8 +27,8 @@ export interface Profile {
   display_name?: string | null;
   bio?: string | null;
   avatar_url?: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string; // Changed from Date to string to match Supabase
+  updated_at: string; // Changed from Date to string
 }
 
 export interface FeedbackType {
@@ -37,8 +37,8 @@ export interface FeedbackType {
   name: string;
   description?: string | null;
   is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string; // Changed from Date to string
+  updated_at: string; // Changed from Date to string
 }
 
 export interface Feedback {
@@ -48,7 +48,9 @@ export interface Feedback {
   sender_id?: string | null; // user giving feedback (optional)
   content: string;
   is_anonymous: boolean;
-  created_at: Date;
+  created_at: string; // Changed from Date to string
+  is_public?: boolean; // Added this property for FeedbackCard
+  rating?: number; // Added this property for FeedbackCard
 }
 
 export interface ApiKey {

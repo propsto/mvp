@@ -26,8 +26,8 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
 }) => {
   // In a real app, you would use real data from an API
   const profileName = "Jane Doe";
-  const authorName = feedback.authorId ? "John Smith" : "Anonymous";
-  const formattedDate = new Date(feedback.createdAt).toLocaleDateString();
+  const authorName = feedback.sender_id ? "John Smith" : "Anonymous";
+  const formattedDate = new Date(feedback.created_at).toLocaleDateString();
   
   return (
     <Card className="mb-4">
@@ -41,7 +41,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
             )}
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">From: {authorName}</span>
-              {feedback.isPublic ? (
+              {feedback.is_public ? (
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Public</Badge>
               ) : (
                 <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Private</Badge>
@@ -73,7 +73,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
                     size="sm" 
                     onClick={() => onToggleVisibility && onToggleVisibility(feedback.id)}
                   >
-                    {feedback.isPublic ? (
+                    {feedback.is_public ? (
                       <EyeOff className="h-4 w-4" />
                     ) : (
                       <Eye className="h-4 w-4" />
@@ -81,7 +81,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {feedback.isPublic ? "Make private" : "Make public"}
+                  {feedback.is_public ? "Make private" : "Make public"}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

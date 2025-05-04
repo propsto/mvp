@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -64,6 +63,7 @@ const FeedbackTypesPage = () => {
         
       if (error) throw error;
       
+      // Type assertion since we modified our FeedbackType interface
       setFeedbackTypes(data as FeedbackType[]);
     } catch (error) {
       console.error("Error fetching feedback types:", error);

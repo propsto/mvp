@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import FeedbackCard from "@/components/feedback/FeedbackCard";
-import FeedbackForm from "@/components/feedback/FeedbackForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Plus, Filter } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Feedback } from "@/lib/types";
+import FeedbackForm from "@/components/feedback/FeedbackForm";
 
 const FeedbackPage: React.FC = () => {
   const { toast } = useToast();
@@ -19,33 +19,30 @@ const FeedbackPage: React.FC = () => {
   const initialFeedback: Feedback[] = [
     {
       id: "1",
-      profileId: "profile1",
-      organizationId: "org1",
+      profile_id: "profile1",
       content: "Really great work on the latest project! Your attention to detail was exceptional and you delivered everything on time.",
-      isPublic: true,
-      createdAt: new Date(Date.now() - 86400000), // 1 day ago
-      updatedAt: new Date(Date.now() - 86400000),
+      is_anonymous: false,
+      is_public: true,
+      created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
     },
     {
       id: "2",
-      profileId: "profile2",
-      organizationId: "org1",
-      authorId: "user1",
+      profile_id: "profile2",
+      sender_id: "user1",
       content: "I appreciate your help with the client presentation. It made a big difference in how we communicated the value proposition.",
       rating: 5,
-      isPublic: false,
-      createdAt: new Date(Date.now() - 172800000), // 2 days ago
-      updatedAt: new Date(Date.now() - 172800000),
+      is_anonymous: false,
+      is_public: false,
+      created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     },
     {
       id: "3",
-      profileId: "profile3",
-      organizationId: "org1",
+      profile_id: "profile3",
       content: "Communication could be improved. Sometimes I wasn't sure about the project status.",
       rating: 3,
-      isPublic: true,
-      createdAt: new Date(Date.now() - 259200000), // 3 days ago
-      updatedAt: new Date(Date.now() - 259200000),
+      is_anonymous: false,
+      is_public: true,
+      created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
     },
   ];
   
@@ -55,7 +52,7 @@ const FeedbackPage: React.FC = () => {
     setFeedbackItems(prevItems => 
       prevItems.map(item => 
         item.id === id 
-          ? { ...item, isPublic: !item.isPublic }
+          ? { ...item, is_public: !item.is_public }
           : item
       )
     );
@@ -88,6 +85,17 @@ const FeedbackPage: React.FC = () => {
     item.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
+  // Mock feedback type for the form in the dialog
+  const mockFeedbackType = {
+    id: "type1",
+    profile_id: "profile1",
+    name: "General",
+    description: "General feedback about my work",
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-8">
@@ -118,7 +126,11 @@ const FeedbackPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Add New Feedback</DialogTitle>
             </DialogHeader>
-            <FeedbackForm onSuccess={() => setShowAddDialog(false)} />
+            <FeedbackForm 
+              profileId="profile1" 
+              feedbackType={mockFeedbackType} 
+              onSuccess={() => setShowAddDialog(false)}
+            />
           </DialogContent>
         </Dialog>
       </div>

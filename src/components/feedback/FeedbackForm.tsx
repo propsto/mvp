@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface FeedbackFormProps {
   profileId: string;
   feedbackType: FeedbackType;
+  onSuccess?: () => void; // Added onSuccess prop
 }
 
 const feedbackSchema = z.object({
@@ -24,7 +25,7 @@ const feedbackSchema = z.object({
 
 type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 
-export function FeedbackForm({ profileId, feedbackType }: FeedbackFormProps) {
+export function FeedbackForm({ profileId, feedbackType, onSuccess }: FeedbackFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +67,12 @@ export function FeedbackForm({ profileId, feedbackType }: FeedbackFormProps) {
       });
       
       form.reset();
+      
+      // Call onSuccess if it exists
+      if (onSuccess) {
+        onSuccess();
+      }
+      
     } catch (error: any) {
       toast({
         title: "Error",
