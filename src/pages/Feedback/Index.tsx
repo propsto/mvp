@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Plus, Filter } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import type { Feedback } from "@/lib/types";
+import type { Feedback, FeedbackType } from "@/lib/types";
 import FeedbackForm from "@/components/feedback/FeedbackForm";
 
 const FeedbackPage: React.FC = () => {
@@ -86,11 +86,12 @@ const FeedbackPage: React.FC = () => {
   );
   
   // Mock feedback type for the form in the dialog
-  const mockFeedbackType = {
+  const mockFeedbackType: FeedbackType = {
     id: "type1",
     profile_id: "profile1",
     name: "General",
     description: "General feedback about my work",
+    input_type: "text", // Added missing property
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()

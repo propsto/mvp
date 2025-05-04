@@ -50,26 +50,42 @@ const ProfilePage = () => {
         
         if (!profileByUsername) {
           // Check user_emails table for this identifier
-          const { data: userEmail, error: userEmailError } = await supabase
+          const { data: userEmailData, error: userEmailError } = await supabase
             .from("user_emails")
-            .select("*, profiles(*)")
+            .select("*")
             .eq("email", username)
             .maybeSingle();
             
           if (userEmailError) throw userEmailError;
           
-          if (userEmail) {
-            // Use the profile associated with this email
-            profileByUsername = userEmail.profiles;
-            // Also set the custom display name and bio if available
-            if (userEmail.display_name) {
-              profileByUsername.display_name = userEmail.display_name;
-            }
-            if (userEmail.bio) {
-              profileByUsername.bio = userEmail.bio;
-            }
-            if (userEmail.avatar_url) {
-              profileByUsername.avatar_url = userEmail.avatar_url;
+          if (userEmailData) {
+            // Now fetch the profile associated with this user_id
+            const { data: associatedProfile, error: profileError } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", userEmailData.user_id)
+              .maybeSingle();
+              
+            if (profileError) throw profileError;
+            
+            if (associatedProfile) {
+              // Use the profile associated with this email
+              profileByUsername = associatedProfile;
+              
+              // Also set the custom display name and bio if available from the email
+              if (userEmailData.display_name) {
+                profileByUsername.display_name = userEmailData.display_name;
+              }
+              if (userEmailData.bio) {
+                profileByUsername.bio = userEmailData.bio;
+              }
+              if (userEmailData.avatar_url) {
+                profileByUsername.avatar_url = userEmailData.avatar_url;
+              }
+            } else {
+              setError("Profile not found");
+              setLoading(false);
+              return;
             }
           } else {
             setError("Profile not found");
@@ -90,11 +106,16 @@ const ProfilePage = () => {
           
         if (typesError) throw typesError;
         
-        // Type assertion since we modified our FeedbackType interface to match Supabase
-        setFeedbackTypes(types as FeedbackType[]);
+        // Set input_type default for any feedback type that doesn't have one
+        const typesWithInputType = types.map((type: any) => ({
+          ...type,
+          input_type: type.input_type || 'text'
+        }));
+        
+        setFeedbackTypes(typesWithInputType as FeedbackType[]);
         
         // If this is the current user, fetch their associated emails
-        if (isCurrentUser || (user && user.id === profileByUsername.id)) {
+        if (user && user.id === profileByUsername.id) {
           const { data: emails, error: emailsError } = await supabase
             .from("user_emails")
             .select("*")
@@ -117,7 +138,7 @@ const ProfilePage = () => {
     if (username) {
       fetchProfile();
     }
-  }, [username, user, isCurrentUser]);
+  }, [username, user]);
 
   if (loading) {
     return (
