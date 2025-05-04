@@ -21,6 +21,7 @@ import {
   Settings,
   Building,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -29,7 +30,9 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
   const [organizationName] = useState("Props.to");
-  const [userName] = useState("John Doe");
+  const { user, profile } = useAuth();
+
+  const displayName = profile?.display_name || profile?.username || user?.email || "";
 
   const menuItems = [
     {
@@ -67,7 +70,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
-        <Navbar userName={userName} />
+        <Navbar />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar className="hidden md:flex">
             <SidebarHeader className="h-16 border-b flex items-center px-4 flex-row">
