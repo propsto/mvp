@@ -1,8 +1,15 @@
-
-import { useLocation } from "react-router-dom";
+import { Router, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { FeatureSuggestionForm } from "@/components/feedback/FeatureSuggestionForm";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -18,21 +25,24 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">501 Not Implemented</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            501 Not Implemented
+          </CardTitle>
           <CardDescription className="text-lg">
             This feature is not yet available in the MVP
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-muted-foreground">
-            We're actively developing new features. Would you like to share what functionality 
-            you were looking for? Your feedback will help us prioritize our roadmap.
+            We're actively developing new features. Would you like to share what
+            functionality you were looking for? Your feedback will help us
+            prioritize our roadmap.
           </p>
           <FeatureSuggestionForm />
           <div className="text-center pt-4">
-            <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-              Return to Home
-            </a>
+            <Button onClick={() => window.history.back()} variant="secondary">
+              <ArrowLeft className="size-8" /> Go back
+            </Button>
           </div>
         </CardContent>
       </Card>

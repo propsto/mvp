@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -15,7 +14,8 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/layout/Navbar";
 import {
   LayoutDashboard,
-  MessageSquare,
+  MessagesSquare,
+  MessageSquareDashed,
   Settings,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,7 +29,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [organizationName] = useState("Props.to");
   const { user, profile } = useAuth();
 
-  const displayName = profile?.display_name || profile?.username || user?.email || "";
+  const displayName =
+    profile?.display_name || profile?.username || user?.email || "";
 
   const menuItems = [
     {
@@ -38,13 +39,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       path: "/dashboard",
     },
     {
-      name: "Feedback",
-      icon: MessageSquare,
+      name: "Received",
+      icon: MessagesSquare,
       path: "/feedback",
     },
     {
-      name: "Feedback Types",
-      icon: MessageSquare,
+      name: "Types",
+      icon: MessageSquareDashed,
       path: "/settings/feedback-types",
     },
     {
