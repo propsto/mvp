@@ -16,8 +16,6 @@ import Navbar from "@/components/layout/Navbar";
 import {
   LayoutDashboard,
   MessageSquare,
-  Users,
-  Key,
   Settings,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,19 +43,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       path: "/feedback",
     },
     {
-      name: "Users",
-      icon: Users,
-      path: "/users",
-    },
-    {
       name: "Feedback Types",
       icon: MessageSquare,
       path: "/settings/feedback-types",
-    },
-    {
-      name: "API Keys",
-      icon: Key,
-      path: "/api",
     },
     {
       name: "Settings",

@@ -23,6 +23,22 @@ import EmailSettingsPage from "./pages/Settings/EmailsSettings";
 import EmailEditorPage from "./pages/Settings/EmailEditorPage";
 import FeedbackFormPage from "./pages/FeedbackFormPage";
 
+// Define internal routes that should never be treated as usernames
+const internalRoutes = [
+  'dashboard', 
+  'feedback', 
+  'api', 
+  'settings', 
+  'auth', 
+  'about', 
+  'privacy', 
+  'terms', 
+  'contact', 
+  'help',
+  'admin',
+  'support'
+];
+
 const App = () => {
   // Create a client inside the component to maintain React context
   const [queryClient] = useState(() => new QueryClient());
@@ -51,10 +67,15 @@ const App = () => {
               <Route path="/settings/email/:emailId" element={<RouteGuard><EmailEditorPage /></RouteGuard>} />
               
               {/* Profile Routes */}
-              <Route path="/:identifier" element={<ProfilePage />} />
               <Route path="/:identifier/:feedbackType" element={<FeedbackFormPage />} />
+              <Route path="/:identifier" element={<ProfilePage />} />
               
-              {/* Catch-all */}
+              {/* Internal routes that should show 501 Not Implemented */}
+              {internalRoutes.map(route => (
+                <Route key={route} path={`/${route}/*`} element={<NotFound />} />
+              ))}
+              
+              {/* Catch-all - will be handled by the ProfilePage logic */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
